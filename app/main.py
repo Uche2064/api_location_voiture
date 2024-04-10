@@ -1,16 +1,27 @@
 from fastapi import FastAPI
 import uvicorn
-from routes import voitures
+from app.routes import user, car, auth
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
-app.include_router(voitures.route)
+origins = [
+    "https://localhost:8000"
+    
+]
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
 
+app.include_router(user.route)
+app.include_router(car.route)
+app.include_router(auth.route)
 
-
-if __name__ == "__main__":
-    uvicorn.run("main:app", host="127.172.0.1", port=5000, reload=True)
 
 
 
