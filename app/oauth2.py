@@ -1,6 +1,7 @@
 from fastapi import Depends, HTTPException, status
 from jose import jwt, JWTError
 from fastapi.security import OAuth2PasswordBearer
+from pydantic import EmailStr
 from .config import setting
 from datetime import datetime as _dt, timedelta as _td
 from . import schemas, models, db
@@ -23,22 +24,17 @@ def create_access_token(payload: dict):
 def verify_token(token, credentials_exception):
     try:
         payload = jwt.decode(token, secret_key, algorithms=[algorithm])
-        id = payload.get("id")
-
-        if id is None:
+        id: int = payload.get("id")    
+        email: EmailStr = payload.get("email")
+        if id is None or email is None:
             raise credentials_exception
-        token_data = schemas.TokenData(id=id)
-
+        return schemas.TokenData(id=id, email=email)
     except JWTError:
         raise credentials_exception
-    
-    return token_data
 
-def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(db.get_db)):
-    credentials_exception = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f"Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
-    token = verify_token(token, credentials_exception)
+def get_current_user(token: str = Depends(oauth2_scheme)):
+    credentials_exception = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f"Information invalide")
 
-    user = db.query(models.User).filter(models.User.id == token.id).first()
+    return  verify_token(token, credentials_exception)
 
-    return user
 

@@ -10,7 +10,7 @@ route = APIRouter(
 )
 
 @route.post("/", response_model=schemas.ResponseCreateUser)
-async def get_voiture(user: schemas.BaseUser, db: Session = Depends(db.get_db)):
+async def save_admin(user: schemas.BaseUser, db: Session = Depends(db.get_db)):
     query = db.query(models.User).filter(models.User.email == user.email).first()
     if query:
         raise HTTPException(status_code=status.HTTP_306_RESERVED, detail="Email déjà pris")

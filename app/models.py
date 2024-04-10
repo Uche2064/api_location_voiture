@@ -18,6 +18,7 @@ class Car(base):
 
     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
     marque = Column(String(150), nullable=False, index=True)
+    couleur = Column(String(150), nullable=False, index=True)
     model = Column(String(60))
     prix = Column(Float, nullable=False)
     is_disponible = Column(Boolean, nullable=False, index=True)
